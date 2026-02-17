@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Виртуальный зоопарк/Виртуальный зоопарк.vcxproj" Id="11ae0076-6d30-4329-a6ae-9e3aac2f7e89" />
+</Solution>
