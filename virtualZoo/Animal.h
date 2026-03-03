@@ -39,7 +39,11 @@ public:
         else if (h > 100) happiness = 100;
         else happiness = h;
     }
-
+    void StatusReduce()
+    {
+        setSatiety(satiety - 1);
+        setHappiness(happiness - 1);
+    }
     void feed()
     {
         setSatiety(satiety + 10);

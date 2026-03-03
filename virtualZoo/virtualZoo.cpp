@@ -1,148 +1,13 @@
 ﻿#include "Animal.h"
+#include "Zoo.h"
+#include "User.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <windows.h> 
 
-
 using namespace std;
-
-class Zoo
-{
-private:
-    vector<Animal> animals;
-    string filename;
-
-public:
-    bool isEmpty()
-    {
-        return animals.empty();
-    }
-    Zoo(string fname) : filename(fname)
-    {
-        load();
-    }
-    void load()
-    {
-        ifstream file(filename);
-        if (!file.is_open()) return;
-        file.imbue(locale(".1251"));
-
-        animals.clear();
-        int id, satiety, happiness;
-        string name, type;
-
-        while (file >> id)
-        {
-            file.ignore();
-            getline(file, name);
-            getline(file, type);
-            file >> satiety >> happiness;
-
-            Animal a(id, name, type);
-            a.setSatiety(satiety);
-            a.setHappiness(happiness);
-            animals.push_back(a);
-        }
-        file.close();
-    }
-
-    void save()
-    {
-        ofstream file(filename);
-        if (!file.is_open()) return;
-        file.imbue(locale(".1251"));
-
-        for (Animal& a : animals)
-        {
-            a.saveToFile(file);
-        }
-        file.close();
-    }
-    void addAnimal()
-    {
-        string name, type;
-        cout << "Введите имя животного: ";
-        cin >> name;
-        cout << "Введите вид животного: ";
-        cin >> type;
-
-        int newId = animals.size() + 1;
-        Animal a(newId, name, type);
-        animals.push_back(a);
-
-        cout << "Животное добавлено!\n";
-        save();
-    }
-
-    void removeAnimal()
-    {
-        int id;
-        cout << "Введите ID животного для удаления: ";
-        cin >> id;
-
-        for (int i = 0; i < animals.size(); i++)
-        {
-            if (animals[i].getId() == id)
-            {
-                animals.erase(animals.begin() + i);
-                cout << "Животное удалено!\n";
-                save();
-                return;
-            }
-        }
-        cout << "Животное с таким ID не найдено!\n";
-    }
-    void editAnimal()
-    {
-        int id;
-        cout << "Введите ID животного для редактирования: ";
-        cin >> id;
-
-        for (Animal& a : animals)
-        {
-            if (a.getId() == id)
-            {
-                string newName, newType;
-                cout << "Текущее имя: " << a.getName() << "\nНовое имя: ";
-                cin >> newName;
-                cout << "Текущий вид: " << a.getType() << "\nНовый вид: ";
-                cin >> newType;
-
-                a.setName(newName);
-                a.setType(newType);
-                cout << "Данные обновлены!\n";
-                save();
-                return;
-            }
-        }
-        cout << "Животное не найдено!\n";
-    }
-    void listAnimals()
-    {
-        if (animals.empty())
-        {
-            cout << "В зоопарке нет животных!\n";
-            return;
-        }
-
-        cout << "\n| СПИСОК ЖИВОТНЫХ |\n";
-        for (Animal& a : animals)
-        {
-            a.Show();
-        }
-    }
-    Animal* findAnimal(int id)
-    {
-        for (Animal& a : animals)
-        {
-            if (a.getId() == id)
-                return &a;
-        }
-        return nullptr;
-    }
-};
 
 void Admin(Zoo& zoo)
 {
@@ -166,10 +31,14 @@ void Admin(Zoo& zoo)
         case 3: zoo.editAnimal(); break;
         case 4: zoo.listAnimals(); break;
         }
+        if (choice != 0)
+        {
+            zoo.AllStatusReduce();
+            zoo.save();
+        }
     } while (choice != 0);
 
 }
-
 void Guest(Zoo& zoo)
 {
     if (zoo.isEmpty())
@@ -213,41 +82,293 @@ void Guest(Zoo& zoo)
         case 3: selectedAnimal->Show();
             break;
         }
+        if (action != 0)
+        {
+            zoo.AllStatusReduce();
+            zoo.save();
+        }
     } while (action != 0);
 }
-class User
+enum Animals{bear,fox,dino,monkey,pinguin,hippo};
+void AnimalsArt(int _type)
 {
-private:
-    string username;
-    string password;
-    string role;
-
-public:
-    User() : username(""), password(""), role("guest") {}
-
-    User(string u, string p, string r) : username(u), password(p), role(r) {}
-
-    string getUsername() { return username; }
-    string getRole() { return role; }
-
-    bool checkPassword(string p) { return password == p; }
-
-    void saveToFile(ofstream& file)
+    switch (_type)
     {
-        file << username << endl << password << endl << role << endl;
+        case bear:
+        cout << R"(медведь
+             __         __
+            /^ \.-"""-./ ^\
+            \    -   -    /
+             |   o   o   |
+             \ .- '''-.  /
+              '-\__Y__/-'
+                 `---`)" << endl; 
+            break;
+        case fox:
+            cout<< R"( 
+                 /|_/|
+                / ^ ^(_o
+               /    __.'
+               /     \
+              (_) (_) '._
+                '.__     '. .-''-'.
+                   ( '.   ('.____.''
+                   _) )'_, )
+                  (__/ (__/)" << endl;
+            break;
+        case dino:
+            cout << R"(
+                       __
+                      / _)
+             _.----._/ /
+            /         /
+         __/ (  | (  |
+        /__.-'|_|--|_|)" << endl;
+            break;
+        case monkey:
+            cout << R"(          
+                    __,__
+           .--.  .-"     "-.  .--.
+          / .. \/  .-. .-.  \/ .. \
+         | \   \  \ 0 | 0 /  /   / |
+          \ '- ,\.-"`` ``"-./, -' /
+            `'-' /_  ^ ^   _\ '-'`
+                 \ \ `~` / /
+                   '~---~')" << endl;
+            break;
+        case pinguin:
+            cout << R"(
+         __
+      -=(o '.
+         '.-.\
+         /|  \\
+         '|  ||
+          _\_):,_)" << endl;
+        case hippo:
+            cout << R"(
+              c~~p ,---------.
+         ,---'oo  )           \
+        ( O O                  )/
+         `=^='                 /
+               \    ,     .   /
+               \\  |-----'|  /
+               ||__|    |_|__|)"<<endl;
+            break;
+        default:
+            cout<<R"(                                                           
+                ####     ####                
+               ######   ######                
+                ####     ####                                       
+          ####                  ####       
+          ####      #####       #####       
+          ###     ##########     ####                       
+                ##############                
+               ################              
+               ################                      
+                 ############)"<<endl;
+        
+            break;
     }
-
-    bool loadFromFile(ifstream& file)
+}
+enum Pets { cat, dog, cow, pig, duck, sheep, horse, goat};
+void PetsArt(int _type)
+{
+    switch (_type)
     {
-        file >> username >> password >> role;
-        return file.good();
-    }
+    case cat: 
+        cout << R"(        
+                   |\_|\
+                   \` ..\
+              __,.-" =__Y=
+            ."        )
+      _    /   ,    \/\_
+     ((____|    )_-\ \_-`
+      `-----'`-----` `--`)" << endl;
+        break;
+    case dog:
+        cout << R"(     
+            _=,_
+         o_/6 / \
+         \__ |  /
+            '|--\
+            /    '-.
+            \ |_   _'-. /
+             |/ \_(   |" 
+            C/ ,--___/)" << endl;
+        break;
+    case cow:
+        cout << R"(
+                  __n__n__
+           .------`-\00/-'
+          /  ##  ## (oo)
+         / \## __   ./
+            |//YY \|/
+            |||   |||)" << endl;
+        break;
+    case pig:
+        cout << R"(
+            --.__.--
+         ___\(0_0)/
+      ~~/     (OO)
+        \  __  /
+         `='`='=)" << endl;
+        break;
+    case duck:
+        cout << R"(
+              ,--.
+             (  6 )-_,
+        (\___ )=='-'
+         \ .   ) )
+          \_`-'_/)" << endl;
+         break;
+    case sheep:
+        cout << R"(
+                        _,._
+                    __.'   _)
+                   <_,)'.-"a\
+                     /' (    \
+         _.-----..,-'   (`"--^
+        //              |
+       (|   `;      ,   |
+         \   ;.----/  ,/
+          ) // /   | |\ \
+          \ \\`\   | |/ /
+           \ \\ \  | |\/
+            `" `"  `"`)" << endl;
+    case horse:
+        cout << R"(
+                   ,--,
+             _ ___/ /\|
+         ,;'( )__, )  
+        //  //   '--; 
+        '   \     | ^
+             ^    ^)" << endl;
+        break;
+    case goat:
+        cout << R"(
+                     ,--._,--.
+                   ,'  ,'   ,-`.
+        (`-.__    /  ,'   /
+         `.   `--'        \__,--'-.
+           `--/       ,-.  ______/
+             (o-.     ,o- /
+              `. ;        \
+               |:          \
+              ,'`       ,   \
+             (o o ,  --'     :
+              \--','.        ;
+               `;;  :       /
+                ;'  ;  ,' ,'
+                ,','  :  '
+                \ \   :)" << endl;
+        break;
 
-    void Show()
-    {
-        cout << "Имя: " << username << ", Роль: " << role << endl;
+    default: 
+        break;
     }
-};
+}
+enum Aqua { goldFish, shark, dolphin, seaHorse, turtle, octopus, walrus, jellyfish};
+void AquaArt(int _type)
+{
+    switch (_type)
+    {
+    case goldFish:
+        cout << R"(
+              /`·.¸
+             /¸...¸`:·
+         ¸.·´  ¸   `·.¸.·´)
+        : © ):´;      ¸  {
+         `·.¸ `·  ¸.·´\`·¸)
+             `\\´´\¸.·)" << endl ;
+        break;
+    case shark:
+        cout << R"(
+         _________         .    .
+        (..       \_    ,  |\  /|
+         \       O  \  /|  \ \/ /
+          \______    \/ |   \  / 
+             vvvv\    \ |   /  |
+             \^^^^  ==   \_/   |
+              `\_   ===    \.  |
+              / /\_   \ /      |
+              |/   \_  \|      /
+                     \________/)" << endl;
+        break;
+    case dolphin:
+        cout << R"(
+                     ,-._
+                   _.-'  '--.
+                 .'      _  -`\_
+                / .----.`_.'----'
+                ;/     `
+               /_;
+        
+            ._      ._      ._      ._
+        _.-._)`\_.-._)`\_.-._)`\_.-._)`\_.-._)" << endl;
+        break;
+    case seaHorse:
+        cout << R"(
+              \/)/)
+            _'  oo(_.-. 
+          /'.     .---'
+        /'-./    (
+        )     ; __\
+        \_.'\ : __|
+             )  _/
+            (  (,.
+             '-.-')" << endl;
+          break;
+    case turtle:
+        cout << R"(     
+                    _,--.---.---.--.._ 
+               _.-' `-`---.`---'-. _,`--.._
+              /`--._ .     `.     `,`-.`-._\
+             ||   \  `---.__`__..-`. ,'`-._/
+        _  ,`\ `-._\      `.    `_.-`-._,``-.
+     ,`   `-_ \/ `-.`-\    _\_.-'\__.-`-.`-._`.
+    (_.o> ,--. `._/'--`,--`  \_.-'       \`-._ \
+     `---'    `._ `---/__,----`           `-. `-\
+               /_, ,  .-'                    `-._\
+               \_, \/ (
+                \_, \/_\
+                 `._,\._\  
+                    `_-_-_.-')" << endl;
+        break;
+    case octopus:
+        cout << R"( 
+              .'.'
+              .'-'.
+          .  (  o O)
+           \_ `  _,   _
+        -.___'.) ( ,-'
+             '-.O.'-..-..       
+         ./\/\/ | \_.-._
+                ;
+             ._/)" << endl;
+        break;
+    case walrus:
+        cout << R"( 
+             ___  
+            /  .\ 
+           /  =__|
+          /    ||)" << endl;
+    case jellyfish:
+        cout << R"(   
+              _______
+         ,-~~~       ~~~-,
+        (                 )
+         \_-, , , , , ,-_/
+            / / | | \ \
+            | | | | | |
+            | | | | | |
+           / / /   \ \ \
+           | | |   | | |)" << endl;
+        break;
+    default:
+        break;
+    }
+}
+
 int main()
 {
     SetConsoleCP(1251);
@@ -257,6 +378,8 @@ int main()
     locale rus(".1251");
 
     Zoo zoo("animals.txt");
+    Zoo farm("farm.txt");
+    Zoo aqua("aqua.txt");
 
     User admin("admin", "1234", "admin");
 
@@ -301,3 +424,11 @@ int main()
     }
     return 0;
 }
+
+//cout << "__         __" << endl;
+//cout<<"/ \. - """-./  \" << endl;
+//cout<<"\    -   -    /"<< endl;
+//cout<<"| o   o |" << endl;
+//cout<<"\  . - '''-.  /" << endl;
+//cout<<"'-\__Y__/-'" << endl;
+//cout<<"`---`" << endl;
